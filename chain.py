@@ -26,3 +26,20 @@ class Blockchain:
         last_block = self.blocks[-1]
         new_block = Block(data=data, previous_hash=last_block.hash)
         self.blocks.append(new_block) # add the new block to the blockchain
+
+if __name__ == "__main__":
+    blockchain = Blockchain()
+    # blockchain.block[0] is the genesis block
+    print(blockchain.blocks[0])
+    
+    blockchain.add_block("First Block")
+    blockchain.add_block("Second Block")
+    blockchain.add_block("Third Block")
+    blockchain.add_block("Fourth Block")
+    
+    # let's safe the entire blockchain in JSON file 😅
+    with open("data.json", "w") as f:
+        json.dump([block.__dict__ for block in blockchain.blocks], f, indent=4)
+        # and print all the blocks to the console
+        print(json.dumps([block.__dict__ for block in blockchain.blocks], indent=4))
+        
