@@ -19,3 +19,17 @@ class Block:
         if isinstance(self.data, bytes):
             dict_copy['data'] = base64.urlsafe_b64encode(self.data).decode('utf-8')
         return json.dumps(dict_copy, indent=4)
+
+   @classmethod
+    def genesis(cls):
+        key = Fernet.generate_key()
+        return cls(key.decode(), "genesis", "0000")
+
+    @classmethod
+    def mine_block(cls, last_block, message="Muh", key=Fernet.generate_key()):
+        fernet = Fernet(key)
+        encrypted_data = fernet.encrypt(message.encode('utf-8'))
+        timestamp = time.time_ns()
+        last_hash = last_block.block_hash
+        difficulty = last_block.difficulty  # Could add adaptive: +1 if conditions met, but keeping simple
+        nonce = 0
