@@ -26,10 +26,30 @@ class Block:
         return cls(key.decode(), "genesis", "0000")
 
     @classmethod
-    def mine_block(cls, last_block, message="Muh", key=Fernet.generate_key()):
+    def mine_block(cls, last_block, message="muh", key=Fernet.generate_key()):
         fernet = Fernet(key)
         encrypted_data = fernet.encrypt(message.encode('utf-8'))
         timestamp = time.time_ns()
         last_hash = last_block.block_hash
         difficulty = last_block.difficulty  # Could add adaptive: +1 if conditions met, but keeping simple
         nonce = 0
+
+     while True:
+            encrypted_data_str = base64.urlsafe_b64encode(encrypted_data).decode('utf-8')
+            hash_input = f"{timestamp}{last_hash}{encrypted_data_str}{nonce}".encode('utf-8')
+            hash_value = hashlib.sha256(hash_input).hexdigest()
+            print(hash_value)
+
+            if hash_value.startswith('0' * difficulty):
+                new_block = cls(
+                    data=encrypted_data,
+                    block_hash=hash_value,
+                    last_hash=last_hash,
+                    difficulty=difficulty,
+                    timestamp=timestamp,
+                    nonce=nonce  # Store the nonce
+                )
+                return new_block
+            nonce += 1
+
+
